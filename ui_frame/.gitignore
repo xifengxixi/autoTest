@@ -1,0 +1,10 @@
+./__pycache__
+./.idea
+*.pyc
+*.html
+*.csv
+*.xlsx
+*.ini
+*.txt
+*.json
+./reports
