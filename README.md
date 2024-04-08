@@ -140,14 +140,14 @@ autoTest
 
 ##### 4.1 接口报告
 
-![apiReport1.png](.\api_frame\testData\images\apiReport1.png)
+![apiReport1.png](api_frame/testData/images/apiReport1.png)
 
 ##### 4.2 UI报告
 
-![uiReport1.png](.\ui_frame\testData\images\uiReport1.png)
+![uiReport1.png](ui_frame/testData/images/uiReport1.png)
 
-![uiReport2.png](.\ui_frame\testData\images\uiReport2.png)
+![uiReport2.png](ui_frame/testData/images/uiReport2.png)
 
-![uiReport3.png](.\ui_frame\testData\images\uiReport3.png)
+![uiReport3.png](ui_frame/testData/images/uiReport3.png)
 
-![uiReport4.png](.\ui_frame\testData\images\uiReport4.png)
+![uiReport4.png](ui_frame/testData/images/uiReport4.png)
