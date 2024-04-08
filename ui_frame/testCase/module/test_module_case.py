@@ -19,7 +19,7 @@ def class_fixture(browser, class_login):
 
 @allure.epic("xx项目")
 @allure.feature("xx模块-xx功能")
-class TestEsbApplication2:
+class TestModule:
 
     def setup_class(self):
         # 页面
