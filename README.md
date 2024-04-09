@@ -132,7 +132,7 @@ autoTest
 7. utils，包括allure报告分析工具、日志工具等
 8. 框架支持多浏览器多截图，适合不同角色的场景
 9. config.py若打开调试模式，debug=True，则运行用例的时候首先在当前打开的浏览器（自动化打开的浏览器）中接着运行用例
-10. 用例setup_class，不能直接调用conftest中的class_login，因此需要以fixtrue的方式进行登录，具体方式查看项目中的例子
+10. 用例setup_class，不能直接调用conftest中的class_login，因此需要以fixture的方式进行登录，具体方式查看项目中的例子
 11. UI框架可调用接口框架的接口，在用例编写时可结合接口和UI，提升用例运行效率，同时可避免对同一功能进行多次UI验证
 12. 用例运行前需要将ui_frame、ui_frame\pageObject标记为Sources Root文件夹
 
