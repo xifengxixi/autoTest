@@ -142,6 +142,31 @@ class BaseApi():
                     matches.extend(ret)
         return matches if matches else None
 
+    def find_jsonpath(self, json_data, target_value, path="", paths=[]):
+        """
+        在给定的 JSON 数据中查找目标值对应的 JSONPath
+        :param json_data: 要搜索的 JSON 数据
+        :param target_value: 要查找的目标值
+        :param path: 递归调用时当前的 JSONPath
+        :param paths: 存储找到的 JSONPath
+        :return: 如果只有一个匹配结果，则返回字符串形式的 JSONPath；如果有多个匹配结果，则返回列表形式的 JSONPath
+        """
+        if isinstance(json_data, dict):
+            for key, value in json_data.items():
+                new_path = f"{path}.{key}" if path else key
+                if value == target_value:
+                    paths.append(new_path)
+                elif isinstance(value, (dict, list)):
+                    find_jsonpath(value, target_value, new_path, paths)
+        elif isinstance(json_data, list):
+            for index, item in enumerate(json_data):
+                new_path = f"{path}[{index}]"
+                if item == target_value:
+                    paths.append(new_path)
+                elif isinstance(item, (dict, list)):
+                    find_jsonpath(item, target_value, new_path, paths)
+        return paths[0] if len(paths) == 1 else paths
+
     def sha1_encrypt(self, text):
         """使用sha1加密"""
         # 创建SHA-1对象
