@@ -125,7 +125,7 @@ class openBrowser():
                     driver = self.new_browser(browser)
             else:
                 driver = self.new_browser(browser)
-            driver.set_window_size(1920, 1280)
+            # driver.set_window_size(1920, 1280)
             logger.info(f"打开浏览器：{browser}")
         except:
             logger.error(f"打开浏览器：{browser}失败！")

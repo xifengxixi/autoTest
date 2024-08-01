@@ -54,7 +54,7 @@ class Page(object):
     def login(self, username, password, url=""):
         '''输入用户名密码点击登录'''
         self.load_url(url)
-        domain = self.base_url.split("//")[-1]
+        domain = f'.{self.base_url.split("//")[-1].split(":")[0]}'
         PHPSESSID = self.BaseApi.login_api(username, password)
         self.driver.add_cookie({
             'name': 'PHPSESSID',
@@ -66,7 +66,7 @@ class Page(object):
     def other_login(self, username, password):
         '''重新登录'''
         _BASE_URL = UiConfig.base_url
-        domain = self.base_url.split("//")[-1]
+        domain = f'.{self.base_url.split("//")[-1].split(":")[0]}'
         url = _BASE_URL.replace('/releaseWeaver', '')
         PHPSESSID = self.BaseApi.login_api(username, password)
         self.driver.add_cookie({
@@ -84,7 +84,7 @@ class Page(object):
         :param url: 例子：http://www.testingedu.com.cn:8000/index.php
         :return:
         """
-        domain = url.split("//")[-1].split("/")[0]
+        domain = f'.{url.split("//")[-1].split(":")[0]}'
         is_https = True if url.find('https') > -1 else False
         PHPSESSID = self.BaseApi.login_api(username, password, domain=domain, is_https=is_https)
         self.load_url(url)
