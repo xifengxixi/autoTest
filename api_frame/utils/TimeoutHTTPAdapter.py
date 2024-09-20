@@ -1,6 +1,9 @@
 import os
 import time
+import json
+import urllib
 import inspect
+import panda as pd
 from requests.models import Response
 from api_frame.config import ApiConfig
 from ui_frame.config import UiConfig
@@ -67,6 +70,54 @@ class TimeoutHTTPAdapter(HTTPAdapter):
 
         kwargs.setdefault('verify', False)
         kwargs.setdefault('timeout', self.timeout)
+
+        # 判断接口是否为openapi的接口，如果是则拦截并调用esb接口
+        abs_path = os.path.abspath(__file__)
+        info_path = os.path.join(abs_path.split('接口自动化测试')[0], r"接口自动化测试\test_data\openapi_interface_info.xlsx")
+        df = pd.read_excel(info_path)
+        openapi_info_list = df.to_dict(orient='records')
+        openapi_url_list = [i['url'] for i in openapi_info_list]
+        payload = {
+            "resourceId": 1034472783597436932,
+            "interfaceId": "",
+            "requestUrl": {},
+            "requestParams": {},
+            "requestBody": {},
+            "requestHeader": {}
+        }
+        no_token_list = ['/oauth2/authorize', '/oauth2/access_token']
+        part_url = request.path_url.split("?")[0]
+        if part_url in openapi_url_list:
+            request_body = request.body
+            request_url = request.url
+            if isinstance(request_body, bytes):
+                request_body = request_body.decode('utf-8')
+            if part_url in no_token_list or "access_token" in request_url or "access_token" in request_body:
+                try:
+                    requestBody = json.loads(request_body)
+                    payload['requestBody'].update(requestBody)
+                except:
+                    decoded_query = self.convert_url_str_to_dict(request_body)
+                    requestParams = decoded_query
+                    payload['requestParams'].update(requestParams)
+                if len(request_url.split("?")) > 1:
+                    requestParams = self.convert_url_str_to_dict(request_url.split("?")[1])
+                    payload['requestParams'].update(requestParams)
+                # 替换 payload 的 interfaceId
+                interfaceId = [i["interfaceId"] for i in openapi_info_list if request.path_url.split("?")[0] == i["url"]][0]
+                payload.update(interfaceId=interfaceId)
+                # 替换 请求的body
+                request.body = json.dumps(payload)
+                # 替换 请求的method
+                request.method = "POST"
+                # 替换 请求的url
+                baseUrl = request.url.split(request.path_url)[0].replace('api', 'weapp')
+                request.url = baseUrl + "/api/bs/esb/setting/test/autoTest/1024828696408260622"
+                # request.url = baseUrl + f"/api/bs/esb/setting/test/autoTest/{os.environ.get('userid')}"
+                # 请求的header中添加ETEAMSID
+                request.headers['ETEAMSID'] = os.environ.get("ETEAMSID_admin")
+                request.headers['Content-Type'] = "application/json"
+                request.headers['Content-Length'] = str(len(request.body))
 
         if not is_https:
             request.url = request.url.replace("https://", "http://")
@@ -150,3 +201,27 @@ class TimeoutHTTPAdapter(HTTPAdapter):
             print(exc_info)
         # os.environ.clear()
         return response
+
+    def convert_url_str_to_dict(self, query_str):
+        """
+        将 url字符串转换为字典
+        :param query_str:
+        :return:
+        """
+        # 解析查询字符串
+        parsed_query = urllib.parse.parse_qs(query_str)
+
+        # 将所有字段的值进行解码
+        decoded_query = {}
+        for key, value in parsed_query.items():
+            # 由于 parse_qs 结果的值是列表，所以取第一个元素
+            decoded_value = value[0]
+            try:
+                # 尝试将其解析为 JSON 对象
+                decoded_value = json.loads(urllib.parse.unquote(decoded_value))
+            except (json.JSONDecodeError, TypeError):
+                # 如果解析失败，就保持原值
+                decoded_value = urllib.parse.unquote(decoded_value)
+            decoded_query[key] = decoded_value
+
+        return decoded_query
